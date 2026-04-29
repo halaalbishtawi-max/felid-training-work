@@ -1,0 +1,242 @@
+mysql> CREATE DATABASE ubs_training;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> USE ubs_training;
+Database changed
+mysql> CREATE TABLE students (
+    ->     id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     name VARCHAR(100),
+    ->     email VARCHAR(100),
+    ->     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE courses (
+    ->     id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     title VARCHAR(100),
+    ->     code VARCHAR(20) UNIQUE
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE enrollments (
+    ->     id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     student_id INT,
+    ->     course_id INT,
+    ->     grade DECIMAL(5,2),
+    ->     enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     FOREIGN KEY (student_id)
+    ->         REFERENCES students(id),
+    ->
+    ->     FOREIGN KEY (course_id)
+    ->         REFERENCES courses(id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> SHOW TABLES;
++------------------------+
+| Tables_in_ubs_training |
++------------------------+
+| courses                |
+| enrollments            |
+| students               |
++------------------------+
+3 rows in set (0.01 sec)
+
+mysql> INSERT INTO students (name, email)
+    -> VALUES
+    -> ('Ahmad', 'ahmad@gmail.com'),
+    -> ('Lana', 'lana@gmail.com'),
+    -> ('Omar', 'omar@gmail.com'),
+    -> ('Sara', 'sara@gmail.com'),
+    -> ('Ali', 'ali@gmail.com');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO courses (title, code)
+    -> VALUES
+    -> ('Database', 'DB101'),
+    -> ('Java', 'JAVA201'),
+    -> ('Web Development', 'WEB301');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM students;
++----+-------+-----------------+---------------------+
+| id | name  | email           | created_at          |
++----+-------+-----------------+---------------------+
+|  1 | Ahmad | ahmad@gmail.com | 2026-04-29 18:08:25 |
+|  2 | Lana  | lana@gmail.com  | 2026-04-29 18:08:25 |
+|  3 | Omar  | omar@gmail.com  | 2026-04-29 18:08:25 |
+|  4 | Sara  | sara@gmail.com  | 2026-04-29 18:08:25 |
+|  5 | Ali   | ali@gmail.com   | 2026-04-29 18:08:25 |
++----+-------+-----------------+---------------------+
+5 rows in set (0.00 sec)
+
+mysql> INSERT INTO enrollments
+    -> (student_id, course_id, grade)
+    -> VALUES
+    -> (1,1,80),
+    -> (1,2,90),
+    ->
+    -> (2,1,70),
+    -> (2,3,85),
+    ->
+    -> (3,2,88),
+    -> (3,3,92),
+    ->
+    -> (4,1,60),
+    -> (4,2,75),
+    ->
+    -> (5,2,95),
+    -> (5,3,89);
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> SELECT
+    -> students.name,
+    -> courses.title,
+    -> enrollments.grade
+    -> FROM enrollments
+    -> INNER JOIN students
+    -> ON enrollments.student_id = students.id
+    -> INNER JOIN courses
+    -> ON enrollments.course_id = courses.id;
++-------+-----------------+-------+
+| name  | title           | grade |
++-------+-----------------+-------+
+| Ahmad | Database        | 80.00 |
+| Lana  | Database        | 70.00 |
+| Sara  | Database        | 60.00 |
+| Ahmad | Java            | 90.00 |
+| Omar  | Java            | 88.00 |
+| Sara  | Java            | 75.00 |
+| Ali   | Java            | 95.00 |
+| Lana  | Web Development | 85.00 |
+| Omar  | Web Development | 92.00 |
+| Ali   | Web Development | 89.00 |
++-------+-----------------+-------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT students.name
+    -> FROM students
+    -> LEFT JOIN enrollments
+    -> ON students.id = enrollments.student_id
+    -> WHERE enrollments.id IS NULL;
+Empty set (0.00 sec)
+
+mysql> SELECT
+    -> courses.title,
+    -> AVG(enrollments.grade) AS average_grade
+    -> FROM enrollments
+    -> INNER JOIN courses
+    -> ON enrollments.course_id = courses.id
+    -> GROUP BY courses.title;
++-----------------+---------------+
+| title           | average_grade |
++-----------------+---------------+
+| Database        |     70.000000 |
+| Java            |     87.000000 |
+| Web Development |     88.666667 |
++-----------------+---------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT
+    -> students.name,
+    -> AVG(enrollments.grade) AS average_grade
+    -> FROM enrollments
+    -> INNER JOIN students
+    -> ON enrollments.student_id = students.id
+    -> GROUP BY students.name
+    -> HAVING AVG(enrollments.grade) > 75;
++-------+---------------+
+| name  | average_grade |
++-------+---------------+
+| Ahmad |     85.000000 |
+| Lana  |     77.500000 |
+| Omar  |     90.000000 |
+| Ali   |     92.000000 |
++-------+---------------+
+4 rows in set (0.00 sec)
+
+mysql> UPDATE enrollments
+    -> SET grade = 99
+    -> WHERE id = 1;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM enrollments;
++----+------------+-----------+-------+---------------------+
+| id | student_id | course_id | grade | enrolled_at         |
++----+------------+-----------+-------+---------------------+
+|  1 |          1 |         1 | 99.00 | 2026-04-29 18:09:02 |
+|  2 |          1 |         2 | 90.00 | 2026-04-29 18:09:02 |
+|  3 |          2 |         1 | 70.00 | 2026-04-29 18:09:02 |
+|  4 |          2 |         3 | 85.00 | 2026-04-29 18:09:02 |
+|  5 |          3 |         2 | 88.00 | 2026-04-29 18:09:02 |
+|  6 |          3 |         3 | 92.00 | 2026-04-29 18:09:02 |
+|  7 |          4 |         1 | 60.00 | 2026-04-29 18:09:02 |
+|  8 |          4 |         2 | 75.00 | 2026-04-29 18:09:02 |
+|  9 |          5 |         2 | 95.00 | 2026-04-29 18:09:02 |
+| 10 |          5 |         3 | 89.00 | 2026-04-29 18:09:02 |
++----+------------+-----------+-------+---------------------+
+10 rows in set (0.00 sec)
+
+mysql> DELETE FROM enrollments
+    -> WHERE id = 2;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM enrollments;
++----+------------+-----------+-------+---------------------+
+| id | student_id | course_id | grade | enrolled_at         |
++----+------------+-----------+-------+---------------------+
+|  1 |          1 |         1 | 99.00 | 2026-04-29 18:09:02 |
+|  3 |          2 |         1 | 70.00 | 2026-04-29 18:09:02 |
+|  4 |          2 |         3 | 85.00 | 2026-04-29 18:09:02 |
+|  5 |          3 |         2 | 88.00 | 2026-04-29 18:09:02 |
+|  6 |          3 |         3 | 92.00 | 2026-04-29 18:09:02 |
+|  7 |          4 |         1 | 60.00 | 2026-04-29 18:09:02 |
+|  8 |          4 |         2 | 75.00 | 2026-04-29 18:09:02 |
+|  9 |          5 |         2 | 95.00 | 2026-04-29 18:09:02 |
+| 10 |          5 |         3 | 89.00 | 2026-04-29 18:09:02 |
++----+------------+-----------+-------+---------------------+
+9 rows in set (0.00 sec)
+
+mysql> EXPLAIN
+    -> SELECT *
+    -> FROM enrollments
+    -> WHERE student_id = 3;
++----+-------------+-------------+------------+------+---------------+------------+---------+-------+------+----------+-------+
+| id | select_type | table       | partitions | type | possible_keys | key        | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------------+------------+------+---------------+------------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | enrollments | NULL       | ref  | student_id    | student_id | 5       | const |    2 |   100.00 | NULL  |
++----+-------------+-------------+------------+------+---------------+------------+---------+-------+------+----------+-------+
+1 row in set, 1 warning (0.01 sec)
+
+mysql> CREATE INDEX idx_student_id
+    -> ON enrollments(student_id);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> EXPLAIN
+    -> SELECT *
+    -> FROM enrollments
+    -> WHERE student_id = 3;
++----+-------------+-------------+------------+------+----------------+----------------+---------+-------+------+----------+-------+
+| id | select_type | table       | partitions | type | possible_keys  | key            | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------------+------------+------+----------------+----------------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | enrollments | NULL       | ref  | idx_student_id | idx_student_id | 5       | const |    2 |   100.00 | NULL  |
++----+-------------+-------------+------------+------+----------------+----------------+---------+-------+------+----------+-------+
+1 row in set, 1 warning (0.00 sec)
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| ubs_training       |
++--------------------+
+5 rows in set (0.00 sec)
