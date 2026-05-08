@@ -36,6 +36,17 @@
                         </g:link>
                         <button class="btn btn-outline-primary" type="submit" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                             <i class="bi-trash"></i> ${message(code: 'default.button.delete.label', default: 'Delete')}
+<h3>Enrolled Students</h3>
+
+<g:each in="${course.enrollments}" var="e">
+
+    <p>
+        ${e.student.name}
+        -
+        Grade: ${e.grade}
+    </p>
+
+</g:each>
                         </button>
                     </fieldset>
                 </g:form>

@@ -29,6 +29,15 @@
                 <h1><g:message code="default.show.label" args="[entityName]" /></h1>
                 <g:flashMessages />
                 <f:display bean="student" listClass="container" listItemClass="row mb-3" labelClass="form-label col-sm-3 text-sm-end" valueClass="col-sm-9" />
+
+                <!-- الجزء الجديد لعرض الكورسات -->
+                <h3>Enrolled Courses</h3>
+                <g:each in="${student.enrollments}" var="e">
+                    <p>
+                        ${e.course.title} - Grade: ${e.grade}
+                    </p>
+                </g:each>
+
                 <g:form resource="${this.student}" controller="${controllerName}" method="DELETE">
                     <fieldset class="bg-body-tertiary">
                         <g:link class="btn btn-outline-primary" action="edit" resource="${this.student}" controller="${controllerName}">
@@ -36,6 +45,17 @@
                         </g:link>
                         <button class="btn btn-outline-primary" type="submit" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                             <i class="bi-trash"></i> ${message(code: 'default.button.delete.label', default: 'Delete')}
+<h3>Enrolled Courses</h3>
+
+<g:each in="${student.enrollments}" var="e">
+
+    <p>
+        ${e.course.title}
+        -
+        Grade: ${e.grade}
+    </p>
+
+</g:each>
                         </button>
                     </fieldset>
                 </g:form>

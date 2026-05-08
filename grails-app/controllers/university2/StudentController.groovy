@@ -9,25 +9,10 @@ class StudentController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-def index(Integer max, Integer offset, String search) {
-
-    params.max = Math.min(max ?: 10, 100)
-    params.offset = offset ?: 0
-
-    def studentList
-    def studentCount
-
-    if (search) {
-        studentList = Student.findAllByNameIlike("%${search}%", params)
-        studentCount = Student.countByNameIlike("%${search}%")
-    } else {
-        studentList = Student.list(params)
-        studentCount = Student.count()
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond studentService.list(params), model:[studentCount: studentService.count()]
     }
-
-    respond studentList,
-            model: [studentCount: studentCount, search: search]
-}
 def search(String name) {
 
     def students = Student.findAllByNameIlike("%${name}%")

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="layout" content="main"/>
+    <title>تسجيل طالب في كورس</title>
+</head>
+<body>
+<h1>تسجيل طالب في كورس</h1>
+
+<g:form controller="enrollment" action="save">
+
+    <div>
+        <label>Student</label>
+        <g:select name="student.id"
+                  from="${Student.list()}"
+                  optionKey="id"
+                  optionValue="name" />
+    </div>
+
+    <div>
+        <label>Course</label>
+        <g:select name="course.id"
+                  from="${Course.list()}"
+                  optionKey="id"
+                  optionValue="title" />
+    </div>
+
+    <div>
+        <label>Grade</label>
+        <g:textField name="grade"/>
+    </div>
+
+    <div>
+        <button type="submit">Enroll</button>
+    </div>
+
+</g:form>
+<g:link action="delete" id="${enrollment.id}"
+        onclick="return confirm('Are you sure?')">
+    Delete
+</g:link>
+</body>
+</html>
