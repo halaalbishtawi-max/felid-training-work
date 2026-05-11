@@ -46,13 +46,24 @@ class StudentController {
         respond new Student(params)
     }
 
-    def save(Student student) {
+   def save(Student student) {
 
-        if (student == null) {
-            notFound()
-            return
-        }
+    if (student == null) {
+        notFound()
+        return
+    }
 
+    if (student.hasErrors()) {
+        respond student.errors, view:'create'
+        return
+    }
+
+    student.save flush:true
+
+    flash.message = "Student created successfully!"
+
+    redirect student
+}
         try {
 
             studentService.save(student)

@@ -9,57 +9,63 @@
 <div id="content" role="main">
     <div class="container">
         <section class="row">
-            <a href="#show-student" class="visually-hidden-focusable" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
+            <a href="#show-student" class="visually-hidden-focusable" tabindex="-1">
+                <g:message code="default.link.skip.label" default="Skip to content&hellip;"/>
+            </a>
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <ul class="navbar-nav container-fluid">
-                    <li class="nav-item"><a class="nav-link btn" aria-label="Home" href="${createLink(uri: '/')}">
-                        <i class="bi-house"></i> <g:message code="default.home.label"/></a>
+                    <li class="nav-item">
+                        <a class="nav-link btn" aria-label="Home" href="${createLink(uri: '/')}">
+                            <i class="bi-house"></i> <g:message code="default.home.label"/>
+                        </a>
                     </li>
-                    <li class="nav-item"><g:link class="nav-link btn" aria-label="List" action="index">
-                        <i class="bi-database"></i> <g:message code="default.list.label" args="[entityName]" /></g:link>
+                    <li class="nav-item">
+                        <g:link class="nav-link btn" aria-label="List" action="index">
+                            <i class="bi-database"></i> <g:message code="default.list.label" args="[entityName]" />
+                        </g:link>
                     </li>
                     <li class="nav-item me-lg-auto">
-                        <g:link class="nav-link btn" aria-label="List" action="create"><i class="bi-database-add"></i> <g:message code="default.new.label" args="[entityName]" /></g:link>
+                        <g:link class="nav-link btn" aria-label="List" action="create">
+                            <i class="bi-database-add"></i> <g:message code="default.new.label" args="[entityName]" />
+                        </g:link>
                     </li>
                 </ul>
             </nav>
         </section>
+
         <section class="row">
             <div id="show-student" class="col-12 content scaffold-show" role="main">
                 <h1><g:message code="default.show.label" args="[entityName]" /></h1>
                 <g:flashMessages />
-                <f:display bean="student" listClass="container" listItemClass="row mb-3" labelClass="form-label col-sm-3 text-sm-end" valueClass="col-sm-9" />
 
-                <!-- الجزء الجديد لعرض الكورسات -->
+               
+                <f:display bean="student" listClass="container" listItemClass="row mb-3"
+                           labelClass="form-label col-sm-3 text-sm-end" valueClass="col-sm-9" />
+
+           
                 <h3>Enrolled Courses</h3>
                 <g:each in="${student.enrollments}" var="e">
                     <p>
-                        ${e.course.title} - Grade: ${e.grade}
+                        ${e.course.title} - Grade: ${e.grade}  
+                        (Enrolled At: <g:formatDate date="${e.enrolledAt}" format="dd-MM-yyyy"/>)
                     </p>
                 </g:each>
 
+                <!-- GPA -->
+                <h3>GPA</h3>
+                <p>
+                    ${new university2.EnrollmentService().calculateGpa(student.id)}
+                </p>
+
+               
                 <g:form resource="${this.student}" controller="${controllerName}" method="DELETE">
                     <fieldset class="bg-body-tertiary">
                         <g:link class="btn btn-outline-primary" action="edit" resource="${this.student}" controller="${controllerName}">
                             <i class="bi-pencil-square"></i> <g:message code="default.button.edit.label" default="Edit" />
                         </g:link>
-                        <button class="btn btn-outline-primary" type="submit" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                        <button class="btn btn-outline-primary" type="submit"
+                                onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                             <i class="bi-trash"></i> ${message(code: 'default.button.delete.label', default: 'Delete')}
-<h3>Enrolled Courses</h3>
-
-<g:each in="${student.enrollments}" var="e">
-
-    <p>
-        ${e.course.title}
-        -
-        Grade: ${e.grade}
-    </p>
-<h3>GPA</h3>
-
-<p>
-    ${new university2.EnrollmentService().calculateGpa(student.id)}
-</p>
-</g:each>
                         </button>
                     </fieldset>
                 </g:form>

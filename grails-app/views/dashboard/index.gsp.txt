@@ -1,0 +1,26 @@
+<h2>Dashboard</h2>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card p-3 bg-primary text-white">
+            <h4>Students</h4>
+            <h2>${studentCount}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 bg-success text-white">
+            <h4>Courses</h4>
+            <h2>${courseCount}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 bg-warning">
+            <h4>Enrollments</h4>
+            <h2>${enrollmentCount}</h2>
+        </div>
+    </div>
+
+</div>

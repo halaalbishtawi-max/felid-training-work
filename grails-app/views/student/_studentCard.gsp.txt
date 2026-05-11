@@ -1,0 +1,4 @@
+<div class="card p-3 mb-2">
+    <h5>${student.name}</h5>
+    <p>${student.email}</p>
+</div>
