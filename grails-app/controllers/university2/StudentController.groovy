@@ -1,83 +1,134 @@
 package university2
-import university2.Student
+
 import grails.validation.ValidationException
+
 import static org.springframework.http.HttpStatus.*
 
 class StudentController {
 
     StudentService studentService
+    EnrollmentService enrollmentService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [
+            save: "POST",
+            update: "PUT",
+            delete: "DELETE"
+    ]
 
     def index(Integer max) {
+
         params.max = Math.min(max ?: 10, 100)
-        respond studentService.list(params), model:[studentCount: studentService.count()]
+
+        respond studentService.list(params),
+                model: [studentCount: studentService.count()]
     }
-def search(String name) {
 
-    def students = Student.findAllByNameIlike("%${name}%")
+    def search(String name) {
 
-    render(view: "index",
-            model: [studentList: students,
-                    studentCount: students.size()])
-}
+        def students = Student.findAllByNameIlike("%${name}%")
+
+        render(
+                view: "index",
+                model: [
+                        studentList : students,
+                        studentCount: students.size()
+                ]
+        )
+    }
+
     def show(Long id) {
+
         respond studentService.get(id)
     }
 
     def create() {
+
         respond new Student(params)
     }
 
     def save(Student student) {
+
         if (student == null) {
             notFound()
             return
         }
 
         try {
+
             studentService.save(student)
+
         } catch (ValidationException e) {
-            respond student.errors, view:'create'
+
+            respond student.errors, view: 'create'
             return
         }
 
         request.withFormat {
+
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'student.label', default: 'Student'), student.id])
+
+                flash.message = message(
+                        code: 'default.created.message',
+                        args: [
+                                message(code: 'student.label', default: 'Student'),
+                                student.id
+                        ]
+                )
+
                 redirect student
             }
-            '*' { respond student, [status: CREATED] }
+
+            '*' {
+                respond student, [status: CREATED]
+            }
         }
     }
 
     def edit(Long id) {
+
         respond studentService.get(id)
     }
 
     def update(Student student) {
+
         if (student == null) {
             notFound()
             return
         }
 
         try {
+
             studentService.save(student)
+
         } catch (ValidationException e) {
-            respond student.errors, view:'edit'
+
+            respond student.errors, view: 'edit'
             return
         }
 
         request.withFormat {
+
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'student.label', default: 'Student'), student.id])
+
+                flash.message = message(
+                        code: 'default.updated.message',
+                        args: [
+                                message(code: 'student.label', default: 'Student'),
+                                student.id
+                        ]
+                )
+
                 redirect student
             }
-            '*'{ respond student, [status: OK] }
+
+            '*' {
+                respond student, [status: OK]
+            }
         }
     }
 
     def delete(Long id) {
+
         if (id == null) {
             notFound()
             return
@@ -86,21 +137,53 @@ def search(String name) {
         studentService.delete(id)
 
         request.withFormat {
+
             form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'student.label', default: 'Student'), id])
-                redirect action:"index", method:"GET"
+
+                flash.message = message(
+                        code: 'default.deleted.message',
+                        args: [
+                                message(code: 'student.label', default: 'Student'),
+                                id
+                        ]
+                )
+
+                redirect action: "index", method: "GET"
             }
-            '*'{ render status: NO_CONTENT }
+
+            '*' {
+                render status: NO_CONTENT
+            }
         }
     }
 
+    def testGpa(Long id) {
+
+        double gpa = enrollmentService.calculateGpa(id)
+
+        render "Student GPA = ${gpa}"
+    }
+
     protected void notFound() {
+
         request.withFormat {
+
             form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'student.label', default: 'Student'), params.id])
+
+                flash.message = message(
+                        code: 'default.not.found.message',
+                        args: [
+                                message(code: 'student.label', default: 'Student'),
+                                params.id
+                        ]
+                )
+
                 redirect action: "index", method: "GET"
             }
-            '*'{ render status: NOT_FOUND }
+
+            '*' {
+                render status: NOT_FOUND
+            }
         }
     }
 }

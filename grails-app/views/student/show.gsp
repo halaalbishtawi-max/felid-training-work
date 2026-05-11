@@ -54,7 +54,11 @@
         -
         Grade: ${e.grade}
     </p>
+<h3>GPA</h3>
 
+<p>
+    ${new university2.EnrollmentService().calculateGpa(student.id)}
+</p>
 </g:each>
                         </button>
                     </fieldset>
